@@ -4,14 +4,15 @@ package Log::Any::IfLOG;
 # VERSION
 
 sub import {
+    my $self = shift;
+
+    my $caller = caller();
     if ($ENV{LOG}) {
         require Log::Any;
-        Log::Any->import;
+        Log::Any->_export_to_caller($caller, @_);
     } else {
-        my $self = shift;
         my $saw_log_param = grep { $_ eq '$log' } @_;
         if ($saw_log_param) {
-            my $caller = caller();
             *{"$caller\::log"} = \Object::Dumb->new;
         }
     }
