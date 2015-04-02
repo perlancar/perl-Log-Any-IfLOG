@@ -1,5 +1,10 @@
 Revision history for Log-Any-IfLOG
 
+0.04    2015-04-02 (PERLANCAR)
+
+	- Return a singleton instead of a new dumb object everytime.
+
+
 0.03    2015-04-02 (PERLANCAR)
 
 	- [ux] Also load Log::Any if TRACE/DEBUG/VERBOSE/QUIET/LOG_LEVEL
