@@ -1,5 +1,11 @@
 Revision history for Log-Any-IfLOG
 
+0.03    2015-04-02 (PERLANCAR)
+
+	- [ux] Also load Log::Any if TRACE/DEBUG/VERBOSE/QUIET/LOG_LEVEL
+	  envs are set.
+
+
 0.02    2015-03-24 (PERLANCAR)
 
 	- No functional changes.
