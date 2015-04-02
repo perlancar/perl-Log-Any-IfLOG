@@ -47,10 +47,10 @@ accept any method but return false.
 
 This is a quick-hack solution to avoid the cost of loading Log::Any under
 "normal condition" (when log-enabling variables/flags are not set to true).
-Since Log::Any 1.00, startup overhead increases to about 7ms on my PC (from
-under 1ms for the previous version). Since I want to keep startup overhead of
-CLI apps under 50ms (see L<Perinci::CmdLine::Lite>) to keep tab completion from
-getting a noticeable lag, every millisecond counts.
+Since Log::Any 1.00, startup overhead increases to about 7-10ms on my PC/laptop
+(from under 1ms for the previous version). Since I want to keep startup overhead
+of CLI apps under 50ms (see L<Perinci::CmdLine::Lite>) to keep tab completion
+from getting a noticeable lag, every millisecond counts.
 
 
 =head1 ENVIRONMENT
