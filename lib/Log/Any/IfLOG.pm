@@ -3,6 +3,8 @@ package Log::Any::IfLOG;
 # DATE
 # VERSION
 
+my $log_singleton;
+
 sub import {
     my $self = shift;
 
@@ -17,7 +19,8 @@ sub import {
     } else {
         my $saw_log_param = grep { $_ eq '$log' } @_;
         if ($saw_log_param) {
-            *{"$caller\::log"} = \Object::Dumb->new;
+            if (!$log_singleton) { $log_singleton = Object::Dumb->new }
+            *{"$caller\::log"} = \$log_singleton;
         }
     }
 }
