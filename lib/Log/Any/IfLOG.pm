@@ -10,7 +10,9 @@ sub import {
 
     my $caller = caller();
 
-    my $log_enabled = $ENV{LOG} || $ENV{TRACE} || $ENV{DEBUG} ||
+    my $log_enabled =
+        $INC{'Log/Any.pm'} ||
+        $ENV{LOG} || $ENV{TRACE} || $ENV{DEBUG} ||
         $ENV{VERBOSE} || $ENV{QUIET} || $ENV{LOG_LEVEL};
 
     if ($log_enabled) {
