@@ -41,7 +41,7 @@ sub new { my $o = ""; bless \$o, shift }
 sub AUTOLOAD { 0 }
 
 1;
-# ABSTRACT: Load Log::Any only if log-related environment variables are set
+# ABSTRACT: Load Log::Any only if "logging is enabled"
 
 =for Pod::Coverage ^(.+)$
 
@@ -52,26 +52,48 @@ sub AUTOLOAD { 0 }
 
 =head1 DESCRIPTION
 
-This module will load L<Log::Any> only when C<LOG> environment variable is true
-(or C<TRACE>, or C<DEBUG>, or C<VERBOSE>, or C<QUIET>, or C<LOG_LEVEL>; these
-variables are used by L<Perinci::CmdLine>). Otherwise, the module is not loaded
-and if user imports C<$log>, a dumb object will be returned instead that will
-accept any method but return false.
+This module is a drop-in replacement/wrapper for L<Log::Any> to be used from
+your modules. This is a quick-hack solution to avoid the cost of loading
+Log::Any under "normal condition". Since Log::Any 1.00, startup overhead
+increases to about 7-10ms on my PC/laptop (from under 1ms for the previous
+version). Because I want to keep startup overhead of CLI apps under 50ms (see
+L<Perinci::CmdLine::Lite>) to keep tab completion from getting a noticeable lag,
+every millisecond counts.
 
-This is a quick-hack solution to avoid the cost of loading Log::Any under
-"normal condition" (when log-enabling variables/flags are not set to true).
-Since Log::Any 1.00, startup overhead increases to about 7-10ms on my PC/laptop
-(from under 1ms for the previous version). Since I want to keep startup overhead
-of CLI apps under 50ms (see L<Perinci::CmdLine::Lite>) to keep tab completion
-from getting a noticeable lag, every millisecond counts.
+This module will only load L<Log::Any> when "logging is enabled". Otherwise, it
+will just return without loading anything. If C<$log> is requested in import, a
+fake object is returned that responds to methods like C<debug>, C<is_debug> and
+so on but will do nothing when called and just return 0.
+
+To determine "logging is enabled":
+
+=over
+
+=item * Is $ENABLE_LOG defined?
+
+This package variable can be used to force "logging enabled" (if true) or
+"logging disabled" (if false). Normally, you don't need to do this except for
+testing.
+
+=item * Is Log::Any is already loaded (from %INC)?
+
+If Log::Any is already loaded, it means we have taken the overhead hit anyway so
+logging is enabled.
+
+=item * Is one of log-related environment variables true?
+
+If one of L<LOG>, C<TRACE>, or C<DEBUG>, or C<VERBOSE>, or C<QUIET>, or
+C<LOG_LEVEL> is true then logging is enabled. These variables are used by
+L<Perinci::CmdLine>.
+
+Otherwise, logging is disabled.
+
+=back
 
 
 =head1 ENVIRONMENT
 
 =head2 LOG => bool
-
-If set to true, will load Log::Any as usual. Otherwise, won't load Log::Any and
-will return a dumb object in C<$log> instead.
 
 =head2 TRACE => bool
 
@@ -82,10 +104,6 @@ will return a dumb object in C<$log> instead.
 =head2 QUIET => bool
 
 =head2 LOG_LEVEL => str
-
-These variables are used by L<Perinci::CmdLine> as a shortcut to set log level.
-The setting of these variables indicate that user wants to see some logging, so
-Log::Any will be loaded under the presence of these variables.
 
 
 =head1 VARIABLES
