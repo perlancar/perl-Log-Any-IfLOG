@@ -5,6 +5,7 @@ package Log::Any::IfLOG;
 
 my $log_singleton;
 
+our $DEBUG;
 our $ENABLE_LOG;
 
 sub import {
@@ -21,10 +22,11 @@ sub import {
             $ENV{LOG} || $ENV{TRACE} || $ENV{DEBUG} ||
             $ENV{VERBOSE} || $ENV{QUIET} || $ENV{LOG_LEVEL};
     }
+    #warn "D:log_enabled: $log_enabled" if $DEBUG;
 
+    my $caller = caller();
     if ($log_enabled) {
         require Log::Any;
-        my $caller = caller();
         Log::Any->_export_to_caller($caller, @_);
     } else {
         my $saw_log_param = grep { $_ eq '$log' } @_;
