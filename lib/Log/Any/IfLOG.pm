@@ -5,18 +5,26 @@ package Log::Any::IfLOG;
 
 my $log_singleton;
 
+our $ENABLE_LOG;
+
 sub import {
     my $self = shift;
 
-    my $caller = caller();
-
-    my $log_enabled =
-        $INC{'Log/Any.pm'} ||
-        $ENV{LOG} || $ENV{TRACE} || $ENV{DEBUG} ||
-        $ENV{VERBOSE} || $ENV{QUIET} || $ENV{LOG_LEVEL};
+    my $log_enabled;
+    if (defined $ENABLE_LOG) {
+        $log_enabled = $ENABLE_LOG;
+    } elsif ($INC{'Log/Any.pm'}) {
+        # Log::Any has been loaded, so we have absorbed the cost anyway
+        $log_enabled = 1;
+    } else {
+        $log_enabled =
+            $ENV{LOG} || $ENV{TRACE} || $ENV{DEBUG} ||
+            $ENV{VERBOSE} || $ENV{QUIET} || $ENV{LOG_LEVEL};
+    }
 
     if ($log_enabled) {
         require Log::Any;
+        my $caller = caller();
         Log::Any->_export_to_caller($caller, @_);
     } else {
         my $saw_log_param = grep { $_ eq '$log' } @_;
@@ -78,6 +86,13 @@ will return a dumb object in C<$log> instead.
 These variables are used by L<Perinci::CmdLine> as a shortcut to set log level.
 The setting of these variables indicate that user wants to see some logging, so
 Log::Any will be loaded under the presence of these variables.
+
+
+=head1 VARIABLES
+
+=head2 $ENABLE_LOG => bool
+
+This setting can be forced to force loading Log::Any or not.
 
 
 =head1 SEE ALSO
