@@ -35,7 +35,8 @@ sub import {
     } else {
         my $saw_log_param = grep { $_ eq '$log' } @_;
         if ($saw_log_param) {
-            *{"$caller\::log"} = __log_singleton();
+            __log_singleton(); # to init $log_singleton
+            *{"$caller\::log"} = \$log_singleton;
         }
     }
 }
