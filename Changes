@@ -1,5 +1,10 @@
 Revision history for Log-Any-IfLOG
 
+0.07    2015-08-17 (PERLANCAR)
+
+	- Fix get_logger().
+
+
 0.06    2015-08-17 (PERLANCAR)
 
 	- Add get_logger() static method.
