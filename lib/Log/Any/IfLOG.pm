@@ -3,47 +3,54 @@ package Log::Any::IfLOG;
 # DATE
 # VERSION
 
-my $log_singleton;
-
 our $DEBUG;
 our $ENABLE_LOG;
 
-sub __init_log_singleton {
+my $log_singleton;
+sub __log_singleton {
     if (!$log_singleton) { $log_singleton = Object::Dumb->new }
+}
+
+sub __log_enabled {
+    if (defined $ENABLE_LOG) {
+        return $ENABLE_LOG;
+    } elsif ($INC{'Log/Any.pm'}) {
+        # Log::Any has been loaded, so we have absorbed the cost anyway
+        return 1;
+    } else {
+        return
+            $ENV{LOG} || $ENV{TRACE} || $ENV{DEBUG} ||
+            $ENV{VERBOSE} || $ENV{QUIET} || $ENV{LOG_LEVEL};
+    }
 }
 
 sub import {
     my $self = shift;
 
-    my $log_enabled;
-    if (defined $ENABLE_LOG) {
-        $log_enabled = $ENABLE_LOG;
-    } elsif ($INC{'Log/Any.pm'}) {
-        # Log::Any has been loaded, so we have absorbed the cost anyway
-        $log_enabled = 1;
-    } else {
-        $log_enabled =
-            $ENV{LOG} || $ENV{TRACE} || $ENV{DEBUG} ||
-            $ENV{VERBOSE} || $ENV{QUIET} || $ENV{LOG_LEVEL};
-    }
-    #warn "D:log_enabled: $log_enabled" if $DEBUG;
-
     my $caller = caller();
-    if ($log_enabled) {
+    if (__log_enabled()) {
         require Log::Any;
         Log::Any->_export_to_caller($caller, @_);
     } else {
         my $saw_log_param = grep { $_ eq '$log' } @_;
         if ($saw_log_param) {
-            __init_log_singleton();
-            *{"$caller\::log"} = \$log_singleton;
+            *{"$caller\::log"} = __log_singleton();
         }
     }
 }
 
 sub get_logger {
-    __init_log_singleton();
-    $log_singleton;
+    if (__log_enabled()) {
+        require Log::Any;
+        my $class = shift;
+        if ($class eq 'Log::Any::IfLOG') {
+            Log::Any->get_logger(@_);
+        } else {
+            Log::Any::get_logger($class, @_);
+        }
+    } else {
+        return __log_singleton();
+    }
 }
 
 package
