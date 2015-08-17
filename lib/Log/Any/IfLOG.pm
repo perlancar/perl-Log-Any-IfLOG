@@ -9,6 +9,7 @@ our $ENABLE_LOG;
 my $log_singleton;
 sub __log_singleton {
     if (!$log_singleton) { $log_singleton = Object::Dumb->new }
+    $log_singleton;
 }
 
 sub __log_enabled {
