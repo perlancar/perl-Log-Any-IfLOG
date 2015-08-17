@@ -8,6 +8,10 @@ my $log_singleton;
 our $DEBUG;
 our $ENABLE_LOG;
 
+sub __init_log_singleton {
+    if (!$log_singleton) { $log_singleton = Object::Dumb->new }
+}
+
 sub import {
     my $self = shift;
 
@@ -31,10 +35,15 @@ sub import {
     } else {
         my $saw_log_param = grep { $_ eq '$log' } @_;
         if ($saw_log_param) {
-            if (!$log_singleton) { $log_singleton = Object::Dumb->new }
+            __init_log_singleton();
             *{"$caller\::log"} = \$log_singleton;
         }
     }
+}
+
+sub get_logger {
+    __init_log_singleton();
+    $log_singleton;
 }
 
 package
