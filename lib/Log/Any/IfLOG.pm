@@ -8,7 +8,7 @@ our $ENABLE_LOG;
 
 my $log_singleton;
 sub __log_singleton {
-    if (!$log_singleton) { $log_singleton = Object::Dumb->new }
+    if (!$log_singleton) { $log_singleton = Log::Any::IfLOG::DumbObj->new }
     $log_singleton;
 }
 
@@ -56,7 +56,7 @@ sub get_logger {
 }
 
 package
-    Object::Dumb;
+    Log::Any::IfLOG::DumbObj;
 sub new { my $o = ""; bless \$o, shift }
 sub AUTOLOAD { 0 }
 
